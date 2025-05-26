@@ -3,15 +3,15 @@ from PyQt6.QtWidgets import QApplication, QWidget, QGridLayout, \
     QMainWindow, QLabel, QLineEdit, QPushButton, QTableWidget, \
     QTableWidgetItem
 from PyQt6.QtGui import QAction
-import sqlite3
 
 import sys
+import sqlite3
 
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Student Management")\
+        self.setWindowTitle("Student Management")
 
         # Create Menubar
         file_menu_item = self.menuBar().addMenu("&File")
@@ -23,7 +23,8 @@ class MainWindow(QMainWindow):
 
         about_action = QAction("About Manager", self)
         help_menu_item.addAction(about_action)
-        # about_action.setMenuRole(QAction.MenuRole.NoRole) # Fix Some Mac Issue
+        # Fix Some Mac Issue
+        # about_action.setMenuRole(QAction.MenuRole.NoRole)
 
         # Table area
         self.table = QTableWidget()
