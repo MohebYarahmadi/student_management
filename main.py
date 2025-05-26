@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from PyQt6.QtWidgets import QApplication, QWidget, QGridLayout, \
-    QMainWindow, QLabel, QLineEdit, QPushButton
+    QMainWindow, QLabel, QLineEdit, QPushButton, QTableWidget
 from PyQt6.QtGui import QAction
 
 import sys
@@ -21,6 +21,15 @@ class MainWindow(QMainWindow):
         about_action = QAction("About Manager", self)
         help_menu_item.addAction(about_action)
         # about_action.setMenuRole(QAction.MenuRole.NoRole) # Fix Some Mac Issue
+
+        # Table area
+        self.table = QTableWidget()
+        self.table.setColumnCount(4)
+        self.table.setHorizontalHeaderLabels(("Id", "Name", "Course", "Mobile"))
+        self.setCentralWidget(self.table)
+
+    def load_data(self):
+        pass
 
         
 
