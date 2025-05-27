@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
-from PyQt6.QtWidgets import QApplication, QWidget, QGridLayout, \
-    QMainWindow, QLabel, QLineEdit, QPushButton, QTableWidget, \
-    QTableWidgetItem, QDialog, QVBoxLayout, QComboBox
+from PyQt6.QtCore import Qt
+from PyQt6.QtWidgets import QApplication, QWidget, \
+    QGridLayout, QMainWindow, QLabel, QLineEdit, \
+    QPushButton, QTableWidget, QTableWidgetItem, \
+    QDialog, QVBoxLayout, QComboBox
 from PyQt6.QtGui import QAction
 
 import sys
@@ -12,8 +14,8 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Student Management")
-        self.setFixedWidth(600)
-        self.setFixedHeight(400)
+        # self.setFixedWidth(600)
+        # self.setFixedHeight(400)
 
         # Create Menubar
         file_menu_item = self.menuBar().addMenu("&File")
@@ -25,11 +27,12 @@ class MainWindow(QMainWindow):
         add_student_action.triggered.connect(self.insert)
         file_menu_item.addAction(add_student_action)
 
-        search_for_record = QAction("Find Student", self)
-        search_for_record.triggered.connect(self.search)
-        edit_menu_item.addAction(search_for_record)
+        search_action = QAction("Find Student", self)
+        search_action.triggered.connect(self.search)
+        edit_menu_item.addAction(search_action)
 
         about_action = QAction("About Manager", self)
+        about_action.triggered.connect(self.about)
         help_menu_item.addAction(about_action)
         # Fix Some Mac Issue
         # about_action.setMenuRole(QAction.MenuRole.NoRole)
@@ -63,6 +66,10 @@ class MainWindow(QMainWindow):
 
     def search(self):
         dialog = SearchDialog()
+        dialog.exec()
+
+    def about(self):
+        dialog = AboutDialog()
         dialog.exec()
 
 
@@ -134,7 +141,47 @@ class SearchDialog(QDialog):
         self.setLayout(layout)
 
     def find(self):
-        print("find the record")
+        name = self.search_input.text()
+        connection = sqlite3.connect('database.db')
+        cursor = connection.cursor()
+        result = cursor.execute(
+            "SELECT * FROM students WHERE name = ?",
+            (name,)
+        )
+        rows = list(result)
+        print(rows)
+        items = manager.table.findItems(
+            name,
+            Qt.MatchFlag.MatchFixedString
+        )
+        for item in items:
+            print(item)
+            manager.table.item(item.row(), 1).setSelected(True)
+
+        cursor.close()
+        connection.close()
+
+
+class AboutDialog(QDialog):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("About")
+        self.setFixedWidth(250)
+        self.setFixedHeight(100)
+
+        layout = QVBoxLayout()
+
+        about_text = QLabel("Designed by Moheb Yarahmadi")
+        layout.addWidget(about_text)
+
+        close_btn = QPushButton("Close")
+        close_btn.clicked.connect(self.close_dialog)
+        layout.addWidget(close_btn)
+
+        self.setLayout(layout)
+
+    def close_dialog(self):
+        print("About dialog closed.")
 
 
 if __name__ == "__main__":
