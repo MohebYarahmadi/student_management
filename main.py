@@ -17,12 +17,17 @@ class MainWindow(QMainWindow):
 
         # Create Menubar
         file_menu_item = self.menuBar().addMenu("&File")
+        edit_menu_item = self.menuBar().addMenu("&Edit")
         help_menu_item = self.menuBar().addMenu("&Help")
 
         # Add submenu for each menubar
         add_student_action = QAction("Add Student", self)
         add_student_action.triggered.connect(self.insert)
         file_menu_item.addAction(add_student_action)
+
+        search_for_record = QAction("Find Student", self)
+        search_for_record.triggered.connect(self.search)
+        edit_menu_item.addAction(search_for_record)
 
         about_action = QAction("About Manager", self)
         help_menu_item.addAction(about_action)
@@ -54,6 +59,10 @@ class MainWindow(QMainWindow):
 
     def insert(self):
         dialog = InsertDialog()
+        dialog.exec()
+
+    def search(self):
+        dialog = SearchDialog()
         dialog.exec()
 
 
@@ -103,6 +112,29 @@ class InsertDialog(QDialog):
         cursor.close()
         connection.close()
         manager.load_data()
+
+
+class SearchDialog(QDialog):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Search")
+        self.setFixedWidth(200)
+        self.setFixedHeight(200)
+
+        layout = QVBoxLayout()
+
+        self.search_input = QLineEdit()
+        self.search_input.setPlaceholderText("Search for:")
+        layout.addWidget(self.search_input)
+
+        search_btn = QPushButton("Find")
+        search_btn.clicked.connect(self.find)
+        layout.addWidget(search_btn)
+
+        self.setLayout(layout)
+
+    def find(self):
+        print("find the record")
 
 
 if __name__ == "__main__":
