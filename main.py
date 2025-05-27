@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 from PyQt6.QtWidgets import QApplication, QWidget, QGridLayout, \
     QMainWindow, QLabel, QLineEdit, QPushButton, QTableWidget, \
-    QTableWidgetItem
+    QTableWidgetItem, QDialog, QVBoxLayout, QComboBox
 from PyQt6.QtGui import QAction
 
 import sys
@@ -12,6 +12,8 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Student Management")
+        self.setFixedWidth(600)
+        self.setFixedHeight(400)
 
         # Create Menubar
         file_menu_item = self.menuBar().addMenu("&File")
@@ -19,6 +21,7 @@ class MainWindow(QMainWindow):
 
         # Add submenu for each menubar
         add_student_action = QAction("Add Student", self)
+        add_student_action.triggered.connect(self.insert)
         file_menu_item.addAction(add_student_action)
 
         about_action = QAction("About Manager", self)
@@ -49,14 +52,62 @@ class MainWindow(QMainWindow):
                 )
         connection.close()
 
+    def insert(self):
+        dialog = InsertDialog()
+        dialog.exec()
 
-def main():
+
+class InsertDialog(QDialog):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Insert New Record")
+        self.setFixedWidth(200)
+        self.setFixedHeight(300)
+
+        layout = QVBoxLayout()  # Select layout, you can use Grid too
+
+        # Create and add name_input
+        self.name_input = QLineEdit()
+        self.name_input.setPlaceholderText("Name")
+        layout.addWidget(self.name_input)
+
+        # Create and add courses combobox
+        self.course_select = QComboBox()
+        courses = ['Biology', 'Math', 'Astronomy', 'Physics']
+        self.course_select.addItems(courses)
+        layout.addWidget(self.course_select)
+
+        # Create and add phone_input
+        self.phone_input = QLineEdit()
+        self.phone_input.setPlaceholderText("Phone Number")
+        layout.addWidget(self.phone_input)
+
+        # Create and add insert_btn
+        insert_btn = QPushButton("Insert")
+        insert_btn.clicked.connect(self.insert_record)
+        layout.addWidget(insert_btn)
+
+        self.setLayout(layout)  # Set the layout
+
+    def insert_record(self):
+        name = self.name_input.text()
+        course = self.course_select.itemText(self.course_select.currentIndex())
+        mobile = self.phone_input.text()
+        connection = sqlite3.connect('database.db')
+        cursor = connection.cursor()
+        cursor.execute(
+            "INSERT INTO students (name, course, mobile) VALUES (?,?,?)",
+            (name, course, mobile)
+        )
+        connection.commit()
+        cursor.close()
+        connection.close()
+        manager.load_data()
+
+
+if __name__ == "__main__":
     app = QApplication(sys.argv)
     manager = MainWindow()
     manager.show()
     manager.load_data()
     sys.exit(app.exec())
-
-
-if __name__ == "__main__":
-    main()
