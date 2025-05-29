@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Moheb Yarahmadi
 from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import QApplication, QWidget, \
     QGridLayout, QMainWindow, QLabel, QLineEdit, \
