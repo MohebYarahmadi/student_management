@@ -245,18 +245,26 @@ class EditDialog(QDialog):
 
         layout = QVBoxLayout()
 
+        # Get selected row information
+        index = manager.table.currentRow()
+        self.student_id = manager.table.item(index, 0).text()   # Id
+        student_name = manager.table.item(index, 1).text()  # Name
+        course_name = manager.table.item(index, 2).text()  # Course
+        phone_number = manager.table.item(index, 3).text()  # Phone
+
         # Create and add name_input
-        self.name_input = QLineEdit()
+        self.name_input = QLineEdit(student_name)
         layout.addWidget(self.name_input)
 
         # Create and add courses combobox
         self.course_select = QComboBox()
         courses = ['Biology', 'Math', 'Astronomy', 'Physics']
         self.course_select.addItems(courses)
+        self.course_select.setCurrentText(course_name)
         layout.addWidget(self.course_select)
 
         # Create and add phone_input
-        self.phone_input = QLineEdit()
+        self.phone_input = QLineEdit(phone_number)
         layout.addWidget(self.phone_input)
 
         # Create and add insert_btn
@@ -267,7 +275,19 @@ class EditDialog(QDialog):
         self.setLayout(layout)  # Set the layout
 
     def edit_record(self):
-        pass
+        name = self.name_input.text()
+        course = self.course_select.itemText(self.course_select.currentIndex())
+        mobile = self.phone_input.text()
+        connection = sqlite3.connect('database.db')
+        cursor = connection.cursor()
+        cursor.execute(
+            "UPDATE students SET name = ?, course = ?, mobile = ? WHERE id = ?",
+            (name, course, mobile, self.student_id)
+        )
+        connection.commit()
+        cursor.close()
+        connection.close()
+        manager.load_data()
 
 
 class DeleteDialog(QDialog):
