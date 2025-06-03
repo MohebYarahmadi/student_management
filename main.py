@@ -5,7 +5,7 @@ from PyQt6.QtWidgets import QApplication, QWidget, \
     QGridLayout, QMainWindow, QLabel, QLineEdit, \
     QPushButton, QTableWidget, QTableWidgetItem, \
     QDialog, QVBoxLayout, QComboBox, QToolBar, \
-    QStatusBar
+    QStatusBar, QMessageBox
 from PyQt6.QtGui import QAction, QIcon
 
 import sys
@@ -227,13 +227,10 @@ class AboutDialog(QDialog):
         layout.addWidget(about_text)
 
         close_btn = QPushButton("Close")
-        close_btn.clicked.connect(self.close_dialog)
+        close_btn.clicked.connect(self.close)
         layout.addWidget(close_btn)
 
         self.setLayout(layout)
-
-    def close_dialog(self):
-        print("About dialog closed.")
 
 
 class EditDialog(QDialog):
@@ -291,7 +288,44 @@ class EditDialog(QDialog):
 
 
 class DeleteDialog(QDialog):
-    pass
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Delete Record")
+        self.setFixedWidth(200)
+        self.setFixedHeight(70)
+
+        layout = QGridLayout()
+
+        confirmation = QLabel("Are you sure to delete?")
+        yes = QPushButton("Yes")
+        no = QPushButton("No")
+
+        layout.addWidget(confirmation, 0, 0, 1, 2)
+        layout.addWidget(yes, 1, 0)
+        layout.addWidget(no, 1, 1)
+        yes.clicked.connect(self.delete_record)
+        no.clicked.connect(self.close)
+
+        self.setLayout(layout)
+
+    def delete_record(self):
+        index = manager.table.currentRow()
+        student_id = manager.table.item(index, 0).text()
+
+        connection = sqlite3.connect("database.db")
+        cursor = connection.cursor()
+        cursor.execute("DELETE FROM students WHERE id = ?", (student_id,))
+        connection.commit()
+        cursor.close()
+        connection.close()
+        manager.load_data()
+
+        self.close()
+
+        confirmation_widget = QMessageBox()
+        confirmation_widget.setWindowTitle("Success")
+        confirmation_widget.setText("Record was deleted.")
+        confirmation_widget.exec()
 
 
 if __name__ == "__main__":
